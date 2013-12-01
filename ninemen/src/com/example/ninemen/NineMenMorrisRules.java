@@ -43,6 +43,13 @@ public class NineMenMorrisRules {
 		return turn;
 	}
 	
+	public int getBlueMarker(){
+		return bluemarker;
+	}
+	
+	public int getRedMarker(){
+		return redmarker;
+	}
 	
 	/**
 	 * Returns true if a move is successful

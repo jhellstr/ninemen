@@ -2,7 +2,7 @@ package com.example.ninemen;
 
 import java.util.ArrayList;
 
-import android.R.style;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+@SuppressLint("DrawAllocation")
 public class BoardView extends View {
 	
 	private Drawable boardImage;
@@ -29,6 +30,13 @@ public class BoardView extends View {
 	private Paint bgPaint;
 
 	NineMenMorrisRules rules;
+	
+	private boolean removeBool = false;
+	
+	
+	private int markerLifted;
+	private boolean markerRemoveable;
+	
 
 	public BoardView(Context context) {
 		super(context);
@@ -53,20 +61,58 @@ public class BoardView extends View {
 	public boolean onTouchEvent(MotionEvent event) {
 		Log.i("TouchView.onTouchEvent", "event = " + event);
 		
-		if(event.getAction() == MotionEvent.ACTION_DOWN || 
-				event.getAction() == MotionEvent.ACTION_UP) {
+		if(event.getAction() == MotionEvent.ACTION_DOWN ){
+			return true;
+		}
+		
+		if(event.getAction() == MotionEvent.ACTION_UP ) {
 			
-			int rectPos = -1;
-			for(Rect r : grid){
-				rectPos++;
-				if(event.getX() > r.left && event.getX() < r.right && event.getY() > r.top && event.getY() < r.bottom){
-					int tmp = getMarkerForRect(rectPos);
-					if(tmp != 0){
-						rules.legalMove(tmp, 0, rules.getTurn());
-					}
+			Log.i("Lol", ""+"asasd");
+			int x = (int) Math.round(event.getX());
+			int y = (int) Math.round(event.getY());
+
+			int boardPos = getBoardPositionForRect(x, y);
+
+			if(rules.getTurn() == NineMenMorrisRules.READ_MOVES){
+				//It's reds turn.
+
+				if(markerRemoveable){
+					//Remove the selected marker
+
+				}
+				if(markerLifted < 0){
+					//Move the lifted marker to a valid position.
+
+				}
+				if(rules.getRedMarker() > 0){
+					//Place a marker anywhere on the board (if the position is empty)
+
+				}
+				else{
+					//Select a marker to move
+
 				}
 			}
-			//rules.legalMove(23, 0, NineMenMorrisRules.READ_MOVES);
+
+			else if(rules.getTurn() == NineMenMorrisRules.BLUE_MOVES){
+				//It's blues turn.
+				if(markerRemoveable){
+					//Remove the selected marker
+					
+				}
+				if(markerLifted < 0){
+					//Move the lifted marker to a valid position.
+
+				}
+				if(rules.getBlueMarker() > 0){
+					//Place a marker anywhere on the board (if the position is empty)
+
+				}
+				else{
+					//Select a marker to move
+
+				}
+			}			
 			
 
 			// Request the system to redraw the view (call onDraw at 
@@ -131,18 +177,8 @@ public class BoardView extends View {
 	}
 	
 	private Rect getRectForMarker(int position){
-		int w = red.getIntrinsicWidth();
-		int h = red.getIntrinsicHeight();
-		w = w-12;
-		h = h-12;
-		Rect newRect = new Rect(0, 0, 0, 0);
-		
-		int vw = this.getWidth();
-		int vh = this.getHeight();
-		
-		
-		
-		
+		Rect newRect = new Rect(0, 0, 0, 0);	
+
 		switch (position){
 		case 1:
 			newRect.set(grid.get(16));
@@ -221,9 +257,16 @@ public class BoardView extends View {
 		return newRect;
 	}
 	
-	private int getMarkerForRect(int rect){
+	private int getBoardPositionForRect(int x, int y){
+		int rectPos = -1;
+		for(Rect r : grid){
+			rectPos++;
+			if(x > r.left && x < r.right && y > r.top && y < r.bottom){
+				break;
+			}
+		}
 		
-		switch (rect){
+		switch (rectPos){
 		case 16:
 			return 1;
 		case 8:
