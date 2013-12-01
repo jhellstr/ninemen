@@ -29,6 +29,14 @@ public class BoardView extends View {
 	
 	private Paint bgPaint;
 
+	private static final String redWon = "Red Won";
+	private static final String blueWon = "Blue Won";
+	private static final String redTurn = "Reds Turn";
+	private static final String blueTurn = "Blues Turn";
+	private String messagePointer;
+	
+	private boolean endgame = false;
+	
 	NineMenMorrisRules rules;
 	
 	private int markerLifted;
@@ -49,12 +57,18 @@ public class BoardView extends View {
 		
 		grid = new ArrayList<Rect>();
 
+		messagePointer = redTurn;
 		
 		boardBounds = new Rect(0, 0, 0, 0);
 	}
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		
+		if(endgame){
+			return true;
+		}
+		
 		Log.i("TouchView.onTouchEvent", "event = " + event);
 		
 		if(event.getAction() == MotionEvent.ACTION_DOWN ){
@@ -80,18 +94,23 @@ public class BoardView extends View {
 				
 				if(markerRemoveable){
 					//Remove the selected marker
-					markerRemoveable = !rules.remove(boardPos, NineMenMorrisRules.READ_MARKER);
+					if(!(markerRemoveable = !rules.remove(boardPos, NineMenMorrisRules.READ_MARKER))){
+						messagePointer = redTurn;
+					}
 				}
 				else if(markerLifted > 0){
 					//Move the lifted marker to a valid position.
 					rules.legalMove(boardPos, markerLifted, NineMenMorrisRules.READ_MOVES);
 					markerRemoveable = rules.remove(boardPos);
 					markerLifted = 0;
+					messagePointer = blueTurn;
 				}
 				else if(rules.getRedMarker() > 0){
 					//Place a marker anywhere on the board (if the position is empty)
 					rules.legalMove(boardPos, 0, NineMenMorrisRules.READ_MOVES);
-					markerRemoveable = rules.remove(boardPos);
+					if(!(markerRemoveable = rules.remove(boardPos))){
+						messagePointer = blueTurn;
+					}
 				}
 				else{
 					//Select a marker to move
@@ -107,18 +126,22 @@ public class BoardView extends View {
 				
 				if(markerRemoveable){
 					//Remove the selected marker
-					markerRemoveable = !rules.remove(boardPos, NineMenMorrisRules.BLUE_MARKER);
-				}
+					if(!(markerRemoveable = !rules.remove(boardPos, NineMenMorrisRules.BLUE_MARKER))){
+						messagePointer = blueTurn;
+					}				}
 				else if(markerLifted > 0){
 					//Move the lifted marker to a valid position.
 					rules.legalMove(boardPos, markerLifted, NineMenMorrisRules.BLUE_MOVES);
 					markerRemoveable = rules.remove(boardPos);
 					markerLifted = 0;
+					messagePointer = redTurn;
 				}
 				else if(rules.getBlueMarker() > 0){
 					//Place a marker anywhere on the board (if the position is empty)
 					rules.legalMove(boardPos, 0, NineMenMorrisRules.BLUE_MOVES);
-					markerRemoveable = rules.remove(boardPos);
+					if(!(markerRemoveable = rules.remove(boardPos))){
+						messagePointer = redTurn;
+					}
 				}
 				else{
 					//Select a marker to move
@@ -127,6 +150,15 @@ public class BoardView extends View {
 						Log.d("LIFTED", "BLUE BOARDPOS: " + markerLifted);
 					}
 				}
+			}
+			
+			if(rules.win(NineMenMorrisRules.BLUE_MARKER)){
+				messagePointer = redWon;
+				endgame = true;
+			}
+			else if(rules.win(NineMenMorrisRules.READ_MARKER)){
+				messagePointer = blueWon;
+				endgame = true;
 			}
 			
 			Log.i("GAME STATUS", "TURN: " + rules.getTurn());
@@ -193,6 +225,16 @@ public class BoardView extends View {
 				blue.draw(canvas);
 			}
 		}
+		
+		bgPaint.setColor(Color.argb(233, 200, 0, 0));
+		bgPaint.setTextSize(60 * this.getResources().getDisplayMetrics().density);
+		canvas.drawText(""+rules.getRedMarker(), w/7, h*14/16, bgPaint);
+		bgPaint.setColor(Color.argb(233, 0, 0, 200));
+		canvas.drawText(""+rules.getBlueMarker(), w*5/7, h*14/16, bgPaint);
+		bgPaint.setTextSize(15 * this.getResources().getDisplayMetrics().density);
+		bgPaint.setColor(Color.argb(233, 0, 0, 0));
+		canvas.drawText(""+messagePointer, w*3/7, h*13/16, bgPaint);
+		
 	}
 	
 	private Rect getRectForMarker(int position){
