@@ -67,26 +67,36 @@ public class BoardView extends View {
 		
 		if(event.getAction() == MotionEvent.ACTION_UP ) {
 			
-			Log.i("Lol", ""+"asasd");
+			
 			int x = (int) Math.round(event.getX());
 			int y = (int) Math.round(event.getY());
 
 			int boardPos = getBoardPositionForRect(x, y);
+			
+			Log.i("Lol", ""+x+" "+y+" "+ boardPos);
+			
+			if(boardPos == 0){
+				return true;
+			}
 
 			if(rules.getTurn() == NineMenMorrisRules.READ_MOVES){
 				//It's reds turn.
 
+				Log.i("asdasd",""+"RED "+boardPos);
+				
 				if(markerRemoveable){
 					//Remove the selected marker
+					markerRemoveable = !rules.remove(boardPos, NineMenMorrisRules.READ_MARKER);
 
 				}
-				if(markerLifted < 0){
+				else if(markerLifted < 0){
 					//Move the lifted marker to a valid position.
 
 				}
-				if(rules.getRedMarker() > 0){
+				else if(rules.getRedMarker() > 0){
 					//Place a marker anywhere on the board (if the position is empty)
-
+					rules.legalMove(boardPos, 0, NineMenMorrisRules.READ_MOVES);
+					markerRemoveable = rules.remove(boardPos);
 				}
 				else{
 					//Select a marker to move
@@ -96,21 +106,24 @@ public class BoardView extends View {
 
 			else if(rules.getTurn() == NineMenMorrisRules.BLUE_MOVES){
 				//It's blues turn.
+				
+				Log.i("asdasd",""+"BLUE "+boardPos);
+				
 				if(markerRemoveable){
 					//Remove the selected marker
-					
+					markerRemoveable = !rules.remove(boardPos, NineMenMorrisRules.BLUE_MARKER);
 				}
-				if(markerLifted < 0){
+				else if(markerLifted < 0){
 					//Move the lifted marker to a valid position.
 
 				}
-				if(rules.getBlueMarker() > 0){
+				else if(rules.getBlueMarker() > 0){
 					//Place a marker anywhere on the board (if the position is empty)
-
+					rules.legalMove(boardPos, 0, NineMenMorrisRules.BLUE_MOVES);
+					markerRemoveable = rules.remove(boardPos);
 				}
 				else{
 					//Select a marker to move
-
 				}
 			}			
 			
@@ -262,60 +275,61 @@ public class BoardView extends View {
 		for(Rect r : grid){
 			rectPos++;
 			if(x > r.left && x < r.right && y > r.top && y < r.bottom){
-				break;
+				Log.i("TAG", ""+ x + " > " + r.left + " && " + x + " < " + r.right + " && " + y + " > " + r.top + " && " + y + " < " + r.bottom);
+				switch (rectPos){
+				case 16:
+					return 1;
+				case 8:
+					return 2;
+				case 0:
+					return 3;
+				case 17:
+					return 4;
+				case 10:
+					return 5;
+				case 3:
+					return 6;
+				case 18:
+					return 7;
+				case 12:
+					return 8;
+				case 6:
+					return 9;
+				case 25:
+					return 10;
+				case 26:
+					return 11;
+				case 27:
+					return 12;
+				case 32:
+					return 13;
+				case 40:
+					return 14;
+				case 48:
+					return 15;
+				case 31:
+					return 16;
+				case 38:
+					return 17;
+				case 45:
+					return 18;
+				case 30:
+					return 19;
+				case 36:
+					return 20;
+				case 42:
+					return 21;
+				case 23:
+					return 22;
+				case 22:
+					return 23;
+				case 21:
+					return 24;
+				}
 			}
 		}
 		
-		switch (rectPos){
-		case 16:
-			return 1;
-		case 8:
-			return 2;
-		case 0:
-			return 3;
-		case 17:
-			return 4;
-		case 10:
-			return 5;
-		case 3:
-			return 6;
-		case 18:
-			return 7;
-		case 12:
-			return 8;
-		case 6:
-			return 9;
-		case 25:
-			return 10;
-		case 26:
-			return 11;
-		case 27:
-			return 12;
-		case 32:
-			return 13;
-		case 40:
-			return 14;
-		case 48:
-			return 15;
-		case 31:
-			return 16;
-		case 38:
-			return 17;
-		case 45:
-			return 18;
-		case 30:
-			return 19;
-		case 36:
-			return 20;
-		case 42:
-			return 21;
-		case 23:
-			return 22;
-		case 22:
-			return 23;
-		case 21:
-			return 24;
-		}
+
 		
 		return 0;
 	}
