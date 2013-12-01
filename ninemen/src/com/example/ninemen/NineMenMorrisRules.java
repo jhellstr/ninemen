@@ -1,5 +1,7 @@
 package com.example.ninemen;
 
+import android.util.Log;
+
 /**
  * @author Jonas Wåhslén, jwi@kth.se. 
  * Revised by Anders Lindström, anderslm@kth.se
@@ -57,7 +59,7 @@ public class NineMenMorrisRules {
 	public boolean legalMove(int To, int From, int color) {
 		if (color == turn) {
 			if (turn == READ_MOVES) {
-				if (redmarker >= 0) {
+				if (redmarker > 0) {
 					if (gameplan[To] == EMPTY_SPACE) {
 						gameplan[To] = READ_MARKER;
 						redmarker--;
@@ -67,7 +69,9 @@ public class NineMenMorrisRules {
 				}
 				/*else*/
 				if (gameplan[To] == EMPTY_SPACE) {
+					Log.d("VALIDMOVE", "FROM: " + From + " TO: " + To);
 					boolean valid = isValidMove(To, From);
+					Log.d("VALIDMOVE", "IT WAS: " + valid);
 					if (valid == true) {
 						gameplan[To] = READ_MARKER;
 						gameplan[From] = EMPTY_SPACE; //ADDED
@@ -80,7 +84,7 @@ public class NineMenMorrisRules {
 					return false;
 				}
 			} else {
-				if (bluemarker >= 0) {
+				if (bluemarker > 0) {
 					if (gameplan[To] == EMPTY_SPACE) {
 						gameplan[To] = BLUE_MARKER;
 						bluemarker--;
@@ -89,7 +93,9 @@ public class NineMenMorrisRules {
 					}
 				}
 				if (gameplan[To] == EMPTY_SPACE) {
+					Log.d("VALIDMOVE", "FROM: " + From + " TO: " + To);
 					boolean valid = isValidMove(To, From);
+					Log.d("VALIDMOVE", "IT WAS: " + valid);
 					if (valid == true) {
 						gameplan[To] = BLUE_MARKER;
 						gameplan[From] = EMPTY_SPACE; //ADDED
@@ -204,9 +210,9 @@ public class NineMenMorrisRules {
 	 * Check whether this is a legal move.
 	 */
 	private boolean isValidMove(int to, int from) {
-		
-		if(to != EMPTY_SPACE) return false;
-		
+
+		if(gameplan[to] != EMPTY_SPACE) return false;
+	
 		switch (to) {
 		case 1:
 			return (from == 4 || from == 22);
